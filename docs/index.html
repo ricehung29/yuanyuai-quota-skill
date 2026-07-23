@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AI Token 監控</title>
+    <link rel="manifest" href="data:application/manifest+json,{}" id="manifestPlaceholder">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Token Monitor">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --surface: #f8fafc;
+            --surface2: #f1f5f9;
+            --border: #e2e8f0;
+            --border-strong: #cbd5e1;
+            --text: #0f172a;
+            --text-secondary: #334155;
+            --muted: #64748b;
+            --dim: #94a3b8;
+            --green: #059669;
+            --green-bg: #ecfdf5;
+            --green-border: #a7f3d0;
+            --yellow: #d97706;
+            --yellow-bg: #fffbeb;
+            --yellow-border: #fde68a;
+            --red: #dc2626;
+            --red-bg: #fef2f2;
+            --red-border: #fecaca;
+            --blue: #2563eb;
+            --blue-bg: #eff6ff;
+            --cyan: #0891b2;
+            --cyan-bg: #ecfeff;
+            --cyan-border: #a5f3fc;
+            --radius-sm: 10px;
+            --radius: 16px;
+            --radius-lg: 20px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 24px 20px;
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container { max-width: 540px; margin: 0 auto; }
+
+        .header { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+        .header .dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; box-shadow:0 0 0 3px rgba(5,150,105,0.15); }
+        .header .dot.ok { background:var(--green); }
+        .header .dot.warn { background:var(--yellow); box-shadow:0 0 0 3px rgba(217,119,6,0.15); }
+        .header .dot.danger { background:var(--red); box-shadow:0 0 0 3px rgba(220,38,38,0.15); animation:pulse 1.2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+        .header h1 { font-size:17px; font-weight:700; color:var(--text); }
+        .header .key-entry { margin-left:auto; display:flex; align-items:center; gap:4px; }
+        .header .key-entry input {
+            font-size:10px; font-family:'SF Mono','Fira Code',monospace;
+            color:var(--muted); background:var(--surface2); border:1px solid var(--border);
+            padding:3px 8px; border-radius:4px; width:110px; outline:none;
+        }
+        .header .key-entry input:focus { border-color:var(--cyan); color:var(--text); }
+        .header .key-entry .kbtn {
+            font-size:10px; padding:3px 6px; border:1px solid var(--border);
+            border-radius:4px; background:var(--surface); cursor:pointer; color:var(--dim);
+        }
+        .header .key-entry .kbtn:hover { color:var(--cyan); border-color:var(--cyan); }
+
+        .sub-row { display:flex; gap:8px; flex-wrap:wrap; font-size:11px; color:var(--dim); margin-bottom:16px; margin-left:18px; }
+        .sub-row .pill { background:var(--surface); border:1px solid var(--border); padding:2px 10px; border-radius:20px; color:var(--muted); }
+        .sub-row .pill strong { color:var(--text-secondary); font-weight:500; }
+
+        .toast { background:var(--red-bg); border:1px solid var(--red-border); border-radius:10px; padding:8px 14px; color:var(--red); font-size:12px; margin-bottom:14px; display:none; }
+        .toast.show { display:block; }
+
+        .btn-refresh {
+            display:flex; align-items:center; justify-content:center; gap:8px;
+            width:100%; margin-bottom:14px; padding:14px 24px;
+            border-radius:var(--radius-sm); border:1.5px solid var(--cyan);
+            background:var(--cyan-bg); color:var(--cyan);
+            cursor:pointer; font-size:15px; font-weight:600;
+            transition:all 0.2s; font-family:inherit;
+            box-shadow:0 1px 3px rgba(8,145,178,0.1);
+        }
+        .btn-refresh:hover { background:var(--cyan); color:#fff; border-color:var(--cyan); }
+        .btn-refresh:active { transform:scale(0.98); }
+
+        .remain-hero {
+            background:linear-gradient(135deg,#f0f9ff 0%,#ecfeff 50%,#f8fafc 100%);
+            border:1px solid var(--cyan-border);
+            border-radius:var(--radius-lg); padding:28px 28px 24px;
+            margin-bottom:16px; text-align:center; position:relative; overflow:hidden;
+        }
+        .remain-hero::after {
+            content:''; position:absolute; top:-40px; right:-40px;
+            width:120px; height:120px; border-radius:50%;
+            background:rgba(8,145,178,0.04); pointer-events:none;
+        }
+        .remain-hero .rh-label { font-size:11px; text-transform:uppercase; letter-spacing:2px; color:var(--cyan); font-weight:700; position:relative; z-index:1; }
+        .remain-hero .rh-row {
+            display:flex; align-items:baseline; justify-content:center; gap:14px;
+            position:relative; z-index:1; margin:4px 0 4px;
+            cursor:pointer; user-select:none;
+        }
+        .remain-hero .rh-row .big-pct { font-size:80px; font-weight:800; line-height:1; color:var(--text); font-variant-numeric:tabular-nums; letter-spacing:-3px; position:relative; z-index:1; }
+        .remain-hero .rh-row .big-pct.warn { color:var(--yellow); }
+        .remain-hero .rh-row .big-pct.danger { color:var(--red); }
+        .remain-hero .rh-row .sec-num { font-size:28px; font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums; position:relative; z-index:1; transition:color .2s; }
+        .remain-hero .rh-row .sec-num:hover { color:var(--text-secondary); }
+        .remain-hero .rh-sub { font-size:13px; color:var(--muted); position:relative; z-index:1; }
+        .remain-hero .rh-sub strong { color:var(--text-secondary); font-weight:600; }
+
+        .gauge-row { display:flex; gap:10px; margin-bottom:14px; align-items:stretch; }
+        .donut-box { flex:0 0 100px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px 10px; display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:var(--shadow); }
+        .donut-box svg { width:66px; height:66px; transform:rotate(-90deg); }
+        .donut-box .bg-ring { fill:none; stroke:var(--border); stroke-width:6; }
+        .donut-box .fg-ring { fill:none; stroke-width:6; stroke-linecap:round; transition:stroke-dashoffset 0.6s,stroke 0.6s; }
+        .donut-box .donut-label { font-size:10px; color:var(--dim); margin-top:4px; }
+        .donut-box .donut-label span { color:var(--text-secondary); font-weight:600; }
+
+        .stat-grid { flex:1; display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+        .s-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px 14px; box-shadow:var(--shadow); }
+        .s-card .s-label { font-size:9px; color:var(--dim); text-transform:uppercase; letter-spacing:0.5px; }
+        .s-card .s-val { font-size:18px; font-weight:700; font-variant-numeric:tabular-nums; color:var(--text-secondary); }
+        .s-card .s-note { font-size:10px; color:var(--dim); }
+
+        .charts-row { display:flex; gap:10px; margin-bottom:14px; }
+        .charts-row .ch-card { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px 12px; box-shadow:var(--shadow); }
+        .charts-row .ch-card .ch-label { font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+        .charts-row .ch-card .ch-label span { color:var(--text-secondary); font-weight:600; }
+
+        .big-bar { display:flex; height:38px; border-radius:10px; overflow:hidden; background:var(--border); }
+        .big-bar .seg { display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; transition:width 0.6s ease; min-width:0; }
+        .big-bar .seg.used { background:linear-gradient(135deg,#2563eb,#3b82f6); }
+        .big-bar .seg.remain { background:linear-gradient(135deg,#059669,#22c55e); }
+        .big-bar-labels { display:flex; justify-content:space-between; margin-top:5px; font-size:10px; color:var(--dim); }
+        .big-bar-labels .lb { display:flex; align-items:center; gap:3px; }
+        .big-bar-labels .lb .sw { width:7px; height:7px; border-radius:2px; display:inline-block; }
+
+        .stack-row { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
+        .stack-row .sl { font-size:10px; color:var(--dim); width:48px; flex-shrink:0; }
+        .stack-row .sr { flex:1; height:22px; background:var(--border); border-radius:6px; overflow:hidden; display:flex; }
+        .stack-row .sr .sb { display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:600; color:#fff; transition:width .5s; }
+        .stack-row .sr .sb.blue { background:#3b82f6; }
+        .stack-row .sr .sb.orange { background:#f59e0b; }
+        .stack-row .sr .sb.green { background:#22c55e; }
+        .stack-row .sv { font-size:11px; font-weight:600; color:var(--text-secondary); width:40px; text-align:right; font-variant-numeric:tabular-nums; }
+        .multi-breakdown { font-size:10px; color:var(--dim); margin-top:6px; }
+
+        .insight-row { display:flex; gap:8px; margin-bottom:12px; }
+        .in-card { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; box-shadow:var(--shadow); }
+        .in-card .it { font-size:11px; font-weight:600; color:var(--text-secondary); margin-bottom:3px; }
+        .in-card .ib { font-size:12px; color:var(--muted); line-height:1.5; }
+        .in-card.ok { border-left:3px solid var(--green); }
+        .in-card.warn { border-left:3px solid var(--yellow); }
+        .in-card.bad { border-left:3px solid var(--red); }
+
+        .tbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px 16px; margin-bottom:14px; box-shadow:var(--shadow); }
+        .tbar .tbit { font-size:10px; color:var(--dim); white-space:nowrap; }
+        .tbar .tbit .tv { color:var(--text-secondary); font-weight:500; }
+        .tbar .cntdown { font-size:18px; font-weight:700; color:var(--cyan); margin-left:auto; font-variant-numeric:tabular-nums; }
+
+        @media (max-width:480px) {
+            body { padding:12px; }
+            .remain-hero { padding:22px 16px; }
+            .remain-hero .rh-num { font-size:52px; }
+            .insight-row { flex-direction:column; }
+            .charts-row { flex-direction:column; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+    <div class="dot ok" id="statusDot"></div>
+    <h1>Token 用量監控</h1>
+    <div class="key-entry">
+        <input type="password" id="apiKeyInput" placeholder="API Key" spellcheck="false" />
+        <button class="kbtn" onclick="sk()" title="儲存">💾</button>
+    </div>
+</div>
+<div class="sub-row">
+    <span class="pill">🔑 <strong id="tokenName">--</strong></span>
+    <span class="pill">🤖 glm-5.2</span>
+    <span class="pill" id="lastRefreshPill" style="font-size:9px;color:var(--dim);">上次: --</span>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<button class="btn-refresh" onclick="f()" id="btnRefresh">
+    🔄 重新整理
+</button>
+
+<div class="remain-hero">
+    <div class="rh-label">剩餘額度</div>
+    <div class="rh-row" onclick="toggleDisplay()" title="點擊切換百分比/次數">
+        <span class="big-pct" id="bigDisplay">--</span>
+        <span class="sec-num" id="secDisplay">--</span>
+    </div>
+    <div class="rh-sub">／ <strong id="bigLimit">--</strong> 次總額度 · 已用 <strong id="bigUsed">--</strong> 次</div>
+</div>
+
+<div class="gauge-row">
+    <div class="donut-box">
+        <svg viewBox="0 0 66 66"><circle class="bg-ring" cx="33" cy="33" r="28"/><circle class="fg-ring" id="donutArc" cx="33" cy="33" r="28" stroke-dasharray="175.93" stroke-dashoffset="175.93"/></svg>
+        <div class="donut-label">使用 <span id="donutPct">--</span></div>
+    </div>
+    <div class="stat-grid">
+        <div class="s-card"><div class="s-label">計費請求</div><div class="s-val" id="billedCalls">--</div><div class="s-note">實際 <span id="realCalls">--</span> 次</div></div>
+        <div class="s-card"><div class="s-label">當前倍率</div><div class="s-val" id="multiplierDisplay">--</div><div class="s-note">額外消耗 <span id="multiplierCost">--</span></div></div>
+        <div class="s-card"><div class="s-label">消耗速率</div><div class="s-val" id="burnRate">--</div><div class="s-note" id="burnRateNote">--</div></div>
+        <div class="s-card"><div class="s-label">下次重置</div><div class="s-val" id="resetTimeSmall">--</div><div class="s-note"><span id="countdownSmall">--</span></div></div>
+    </div>
+</div>
+
+<div class="charts-row">
+    <div class="ch-card">
+        <div class="ch-label">📊 額度使用 <span>實際 vs 計費</span></div>
+        <div class="big-bar"><div class="seg used" id="segBilled" style="width:0%"></div><div class="seg remain" id="segRemain" style="width:100%"></div></div>
+        <div class="big-bar-labels"><span class="lb"><span class="sw" style="background:#3b82f6;"></span> 已用 <span id="chartUsed">--</span></span><span class="lb"><span class="sw" style="background:#059669;"></span> 剩餘 <span id="chartRemain">--</span></span></div>
+    </div>
+    <div class="ch-card">
+        <div class="ch-label">📈 倍率影響 <span>計費 vs 實際</span></div>
+        <div class="stack-row"><span class="sl">計費</span><div class="sr"><div class="sb blue" id="stackB" style="width:100%"></div></div><span class="sv" id="stackBVal">--</span></div>
+        <div class="stack-row"><span class="sl">實際</span><div class="sr"><div class="sb green" id="stackR" style="width:100%"></div></div><span class="sv" id="stackRVal">--</span></div>
+        <div class="stack-row"><span class="sl">加成</span><div class="sr"><div class="sb orange" id="stackM" style="width:0%"></div></div><span class="sv" id="stackMVal">--</span></div>
+        <div class="multi-breakdown" id="mbd">--</div>
+    </div>
+</div>
+
+<div class="insight-row">
+    <div class="in-card ok" id="insight1"><div class="it">📊 摘要</div><div class="ib">載入中...</div></div>
+    <div class="in-card ok" id="insight2"><div class="it">⏳ 預估</div><div class="ib">載入中...</div></div>
+</div>
+
+<div class="tbar">
+    <div class="tbit">⏱ 重置 <span class="tv" id="resetTime">--</span></div>
+    <div class="tbit">📅 到期 <span class="tv" id="expiryTime">--</span></div>
+    <div class="tbit">📊 倍率 <span class="tv" id="multiplierLabel">--</span></div>
+    <div class="cntdown" id="countdown">--</div>
+</div>
+
+</div>
+
+<script>
+const API='https://yuanyuaicloud.cn', DONUT=2*Math.PI*28, SK='yuanyuai_api_key';
+function gk(){return localStorage.getItem(SK);}
+function sk(){
+    const i=document.getElementById('apiKeyInput'), r=i.value.trim();
+    if(!r)return; let k=r;
+    if(!k.toLowerCase().startsWith('sk-'))k='sk-'+k;
+    localStorage.setItem(SK,k); i.value=k; i.style.color='#059669'; f();
+    setTimeout(()=>i.style.color='',1500);
+}
+(function(){const i=document.getElementById('apiKeyInput');i.value=gk();i.addEventListener('keydown',e=>{if(e.key==='Enter')sk();});const params=new URLSearchParams(window.location.search);const qk=params.get('key');if(qk){i.value=qk;sk();}})();
+
+let ld=null,dispMode='pct';
+function toggleDisplay(){dispMode=dispMode==='pct'?'count':'pct';if(ld)render(ld);}
+function updateHero(pct,rm){
+	const big=document.getElementById('bigDisplay'),sec=document.getElementById('secDisplay');
+	const cls='big-pct'+(pct>=90?' danger':pct>=65?' warn':'');
+	if(dispMode==='pct'){
+		big.textContent=pct.toFixed(0)+'%'; big.className=cls;
+		sec.textContent='剩餘 '+fm(rm);
+	}else{
+		big.textContent=fm(rm); big.className=cls;
+		sec.textContent=pct.toFixed(0)+'% 使用';
+	}
+}
+function fm(n){return n===void 0||n===null?'--':Number(n).toLocaleString();}
+function st(id,t){const e=document.getElementById(id);if(e)e.textContent=t||'--';}
+
+async function f(){
+    const b=document.getElementById('btnRefresh');
+    b.innerHTML='⏳ 查詢中...'; b.disabled=true;
+    try{
+        let k=gk(); if(k.toLowerCase().startsWith('sk-'))k=k.substring(3);
+        const r=await fetch(API+'/api/query-quota',{headers:{'Authorization':'Bearer '+k,'Content-Type':'application/json'}});
+        const j=await r.json();
+        if(!r.ok||!j.success)throw new Error(j.message||'查詢失敗');
+        ld=j.data; render(j.data);
+        st('lastRefreshPill','上次: '+new Date().toLocaleTimeString('zh-Hant',{hour:'2-digit',minute:'2-digit',second:'2-digit'}));
+    }catch(e){
+        const t=document.getElementById('toast');
+        t.textContent='❌ '+e.message; t.classList.add('show');
+        setTimeout(()=>t.classList.remove('show'),5000);
+    }finally{b.innerHTML='🔄 重新整理'; b.disabled=false;}
+}
+
+function render(d){
+    const rL=d.rateLimit||3000,b=d.billedCalls||0,re=d.realCalls||0,rm=Math.max(0,d.windowRemain??0),mul=d.currentMultiplier||1,mulL=d.multiplierLabel||'×'+mul,nr=d.nextResetTime||0,ex=d.expiredTime??-1,pct=Math.min(100,b/rL*100),mI=Math.max(0,b-re),now=Date.now();
+    updateHero(pct,rm);
+    st('bigLimit',fm(rL)); st('bigUsed',fm(b));
+    const dot=document.getElementById('statusDot'); dot.className='dot'+(pct>=90?' danger':pct>=65?' warn':' ok');
+    st('tokenName',d.name||d.key||gk());
+    st('donutPct',pct.toFixed(0)+'%');
+    const arc=document.getElementById('donutArc'); arc.setAttribute('stroke-dashoffset',DONUT*(1-pct/100)); arc.setAttribute('stroke',pct>=90?'#dc2626':pct>=65?'#d97706':'#059669');
+    st('billedCalls',fm(b)); st('realCalls',fm(re)); st('multiplierDisplay','×'+mul); st('multiplierCost','+'+fm(mI));
+    let br=0,brT='--',brN='--';
+    if(nr>0){const ws=nr-5*3600,el=(now/1000)-ws;if(el>60){br=b/(el/60);brT=br<1?'<1 次/分':Math.round(br)+' 次/分';const eP=el/(5*3600)*100,pj=eP>0?Math.round(b/eP*100):0;brN=pj>rL?'⚠ 預估超限 '+fm(pj):'預估 '+fm(pj)+' 次';}}
+    st('burnRate',brT); st('burnRateNote',brN);
+    charts(b,rm,rL,mI,pct);
+    if(nr){const t=new Date(nr*1000),s=t.toLocaleString('zh-Hant',{hour:'2-digit',minute:'2-digit'});st('resetTime',s);st('resetTimeSmall',s);}
+    if(ex===-1)st('expiryTime','永久有效');else{const t=new Date(ex*1000);st('expiryTime',t.toLocaleString('zh-Hant',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})+(t<new Date()?' 已過期':''));}
+    st('multiplierLabel',mulL); CD(nr);
+    const i1=document.getElementById('insight1'),i2=document.getElementById('insight2');
+    i1.className='in-card'+(pct>=90?' bad':pct>=65?' warn':' ok');
+    i1.querySelector('.ib').textContent=pct>=90?`已消耗 ${pct.toFixed(0)}%，即將達到上限。目前倍率 ×${mul} 加速消耗中。`:pct>=65?`已消耗 ${pct.toFixed(0)}%。倍率 ×${mul}，請留意請求頻率。`:mul>1?`用量正常（${pct.toFixed(0)}%）。倍率 ×${mul}，實際請求 ${fm(re)} 次。`:`用量正常（${pct.toFixed(0)}%）。尚有 ${fm(rm)} 次可用額度。`;
+    if(nr>0){const rh=(nr-now/1000)/3600;if(br>0&&rh>0){const mu=rm/br;if(mu<rh*60){i2.className='in-card bad';const et=new Date((now/1000+mu*60)*1000);i2.querySelector('.ib').textContent=`以目前速率將於 ${et.toLocaleTimeString('zh-Hant',{hour:'2-digit',minute:'2-digit'})} 耗盡額度，早於重置時間。`;}else{i2.className='in-card ok';i2.querySelector('.ib').textContent=`目前速率下額度充足，可支撐至窗口結束（剩餘 ${rh.toFixed(1)} 小時）。`;}}else{i2.className='in-card ok';i2.querySelector('.ib').textContent='數據收集中，尚無法進行準確預估。';}}
+}
+
+function charts(billed,remain,limit,mulI,pct){
+    const uP=Math.min(pct,100),rP=Math.max(0,100-uP);
+    document.getElementById('segBilled').style.width=uP+'%';document.getElementById('segBilled').textContent=uP>12?fm(billed):'';
+    document.getElementById('segRemain').style.width=rP+'%';document.getElementById('segRemain').textContent=rP>12?fm(remain):'';
+    st('chartUsed',fm(billed));st('chartRemain',fm(remain));
+    const real=billed-mulI,mV=Math.max(billed,real,mulI,1);function pO(v){return(v/mV*100).toFixed(1);}
+    document.getElementById('stackB').style.width=pO(billed)+'%';document.getElementById('stackB').textContent=billed>0&&(billed/mV)>0.08?fm(billed):'';
+    document.getElementById('stackR').style.width=pO(real)+'%';document.getElementById('stackR').textContent=real>0&&(real/mV)>0.08?fm(real):'';
+    document.getElementById('stackM').style.width=pO(mulI)+'%';document.getElementById('stackM').textContent=mulI>0&&(mulI/mV)>0.08?'+'+fm(mulI):'';
+    st('stackBVal',fm(billed));st('stackRVal',fm(real));st('stackMVal','+'+fm(mulI));
+    const mul=ld?ld.currentMultiplier:1,mulL=ld?ld.multiplierLabel:'×1';
+    st('mbd',`倍率 ${mulL}：每 ${mul} 次實際請求計為 1 次計費，已累計 ${fm(mulI)} 次額外消耗`);
+}
+
+function CD(ts){
+    if(!ts)return;
+    const d=Math.max(0,ts-Date.now()/1000),h=Math.floor(d/3600),m=Math.floor((d%3600)/60),s=Math.floor(d%60);
+    const str=[h,m,s].map(n=>String(n).padStart(2,'0')).join(':');
+    st('countdown',str);st('countdownSmall',str);
+}
+
+setInterval(()=>{if(ld)CD(ld.nextResetTime);},500);
+setInterval(f,60000);f();
+
+(function(){
+    const m={
+        name:'YuanyuAI Token 監控',short_name:'Token 監控',
+        start_url:window.location.href.split('?')[0],display:'standalone',
+        background_color:'#ffffff',theme_color:'#ffffff',
+        icons:[{src:'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="36" fill="#ffffff"/><circle cx="96" cy="78" r="44" fill="none" stroke="#0891b2" stroke-width="7"/><text x="96" y="86" text-anchor="middle" fill="#0f172a" font-size="26" font-weight="800">'+(ld?Math.min(100,(ld.billedCalls||0)/(ld.rateLimit||3000)*100).toFixed(0):'--')+'%</text><text x="96" y="144" text-anchor="middle" fill="#64748b" font-size="14" font-weight="500">剩餘 '+(ld?fm(Math.max(0,ld.windowRemain||0)):'--')+'</text></svg>'),sizes:'192x192',type:'image/svg+xml'}]
+    };
+    document.getElementById('manifestPlaceholder').href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify(m));
+})();
+</script>
+</body>
+</html>

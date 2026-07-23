@@ -13,6 +13,7 @@
 - ⚠️ **自動提醒** — 用量超過 30% 時自動提示
 - 🔒 **安全儲存** — Key 唔會存喺 repo 內
 - ⏱️ **快取機制** — 15 分鐘內唔重複查詢，唔 spam API
+- 🌐 **Web UI** — GitHub Pages 即開即用 [`ricehung.github.io/yuanyuai-quota-skill/`](https://ricehung.github.io/yuanyuai-quota-skill/)
 
 ## Quick Start
 
@@ -117,6 +118,14 @@ git clone https://github.com/ricehung/yuanyuai-quota-skill.git .claude/skills/yu
    35.2% used (1056/3000) ×2 (13:00-18:59)
    Reset in: 1h 20m
 ```
+
+## Web UI (GitHub Pages)
+
+即開即用嘅用量監控面板：[`https://ricehung.github.io/yuanyuai-quota-skill/`](https://ricehung.github.io/yuanyuai-quota-skill/)
+
+**快速查詢連結：** `https://ricehung.github.io/yuanyuai-quota-skill/?key=sk-xxxxx`
+
+貼上你的 API Key 即開即用，支援手機 PWA 安裝。
 
 ## 安全
 

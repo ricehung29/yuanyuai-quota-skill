@@ -61,6 +61,26 @@ GET https://yuanyuaicloud.cn/api/query-quota
 Authorization: Bearer <api_key_without_sk->
 ```
 
+## Web UI (GitHub Pages)
+
+即開即用嘅用量監控面板，唔需要 CLI：
+
+**網址：** `https://ricehung.github.io/yuanyuai-quota-skill/`
+
+三種用法：
+
+1. **直接打開** — 輸入 API Key 後按儲存
+2. **快速查詢** — `https://ricehung.github.io/yuanyuai-quota-skill/?key=sk-xxxxx`（貼上即自動查詢）
+3. **捷徑 bookmarlet** — 瀏覽器網址列貼上 `https://ricehung.github.io/yuanyuai-quota-skill/?key=sk-xxxxx` 一鍵查詢
+
+功能：
+- 用量百分比 + 剩餘次數（點擊切換顯示）
+- 計費 / 實際請求數、倍率影響
+- 消耗速率、預估超限時間
+- 下次重置倒數
+- 每 60 秒自動刷新
+- 支援 PWA 安裝到手機主畫面
+
 ## Key 儲存位置
 
 - 路徑: `~/.config/peanutking/yuanyuai_key`
