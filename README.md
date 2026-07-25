@@ -6,6 +6,11 @@
 
 即時查詢 YuanyuAI API Key 嘅用量限制，支援自動用量提醒。
 
+## What's New
+
+- **Web UI** — 即開即用嘅用量監控面板，支援 `?key=` 快速查詢
+- **GitHub Pages** — [`ricehung.github.io/yuanyuai-quota-skill/`](https://ricehung.github.io/yuanyuai-quota-skill/)
+
 ## Features
 
 - 📊 **完整報告** — 用量統計、消耗速率、時間資訊
