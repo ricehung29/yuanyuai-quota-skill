@@ -10,6 +10,7 @@
 
 - **Web UI** — 即開即用嘅用量監控面板，支援 `?key=` 快速查詢
 - **GitHub Pages** — [`ricehung.github.io/yuanyuai-quota-skill/`](https://ricehung.github.io/yuanyuai-quota-skill/)
+- **Liquid Glass UI** — Web UI 改為全玻璃質感主題，背景漸變＋毛玻璃卡片
 
 ## Features
 
