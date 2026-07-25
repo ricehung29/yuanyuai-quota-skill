@@ -30,6 +30,67 @@
             --radius-sm: 12px;
             --radius: 18px;
             --radius-lg: 24px;
+            --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #f0e6ff 25%, #e0f2fe 50%, #ccfbf1 75%, #fef3c7 100%);
+            --card-bg: var(--glass);
+            --card-border: var(--glass-border);
+            --card-shadow: var(--glass-shadow);
+            --bar-bg: rgba(255,255,255,0.3);
+            --input-bg: rgba(255,255,255,0.5);
+            --input-bg-focus: rgba(255,255,255,0.7);
+            --bg-glow-1: radial-gradient(circle, rgba(8,145,178,0.08) 0%, transparent 70%);
+            --bg-glow-2: radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%);
+        }
+        /* dark mode vars */
+        html.dark {
+            --glass: rgba(30,41,59,0.7);
+            --glass-border: rgba(71,85,105,0.5);
+            --glass-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            --text: #e2e8f0;
+            --text-secondary: #cbd5e1;
+            --muted: #94a3b8;
+            --dim: #64748b;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #0c4a6e 50%, #134e4a 75%, #292524 100%);
+            --card-bg: var(--glass);
+            --card-border: var(--glass-border);
+            --card-shadow: var(--glass-shadow);
+            --bar-bg: rgba(255,255,255,0.08);
+            --input-bg: rgba(30,41,59,0.5);
+            --input-bg-focus: rgba(30,41,59,0.7);
+            --bg-glow-1: radial-gradient(circle, rgba(56,189,248,0.08) 0%, transparent 70%);
+            --bg-glow-2: radial-gradient(circle, rgba(167,139,250,0.06) 0%, transparent 70%);
+        }
+        /* normal theme */
+        html.normal, html.normal.dark {
+            --glass: initial;
+            --glass-border: initial;
+            --glass-shadow: initial;
+            --card-bg: initial;
+            --card-border: initial;
+            --card-shadow: initial;
+        }
+        html.normal {
+            --bg-gradient: #ffffff;
+            --text: #0f172a;
+            --text-secondary: #334155;
+            --muted: #475569;
+            --dim: #94a3b8;
+            --bar-bg: #e2e8f0;
+            --input-bg: #f1f5f9;
+            --input-bg-focus: #ffffff;
+            --bg-glow-1: none;
+            --bg-glow-2: none;
+        }
+        html.normal.dark {
+            --bg-gradient: #0f172a;
+            --text: #e2e8f0;
+            --text-secondary: #cbd5e1;
+            --muted: #94a3b8;
+            --dim: #64748b;
+            --bar-bg: #1e293b;
+            --input-bg: #1e293b;
+            --input-bg-focus: #334155;
+            --bg-glow-1: none;
+            --bg-glow-2: none;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -39,7 +100,7 @@
             min-height: 100vh;
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
-            background: linear-gradient(135deg, #e0e7ff 0%, #f0e6ff 25%, #e0f2fe 50%, #ccfbf1 75%, #fef3c7 100%);
+            background: var(--bg-gradient);
             background-attachment: fixed;
         }
         body::before {
@@ -50,7 +111,7 @@
             width: 70%;
             height: 70%;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(8,145,178,0.08) 0%, transparent 70%);
+            background: var(--bg-glow-1);
             pointer-events: none;
             z-index: 0;
         }
@@ -62,71 +123,71 @@
             width: 60%;
             height: 60%;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%);
+            background: var(--bg-glow-2);
             pointer-events: none;
             z-index: 0;
         }
         .container { max-width: 540px; margin: 0 auto; position: relative; z-index: 1; }
 
         .glass {
-            background: var(--glass);
+            background: var(--card-bg, var(--glass));
             backdrop-filter: blur(20px) saturate(1.4);
             -webkit-backdrop-filter: blur(20px) saturate(1.4);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--card-border, var(--glass-border));
+            box-shadow: var(--card-shadow, var(--glass-shadow));
         }
 
         .header {
             display:flex; align-items:center; gap:8px; margin-bottom:6px;
-            background: var(--glass);
+            background: var(--card-bg, var(--glass));
             backdrop-filter: blur(20px) saturate(1.4);
             -webkit-backdrop-filter: blur(20px) saturate(1.4);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--card-border, var(--glass-border));
+            box-shadow: var(--card-shadow, var(--glass-shadow));
             border-radius: var(--radius);
             padding: 12px 18px;
         }
-        .header .dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; box-shadow:0 0 0 3px rgba(5,150,105,0.15); }
+        .header .dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
         .header .dot.ok { background:var(--green); box-shadow:0 0 8px var(--green-glow); }
         .header .dot.warn { background:var(--yellow); box-shadow:0 0 8px var(--yellow-glow); }
         .header .dot.danger { background:var(--red); box-shadow:0 0 10px var(--red-glow); animation:pulse 1.2s infinite; }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-        .header h1 { font-size:17px; font-weight:700; color:var(--text); }
+        .header h1 { font-size:17px; font-weight:700; color:var(--text); cursor:pointer; }
         .header .key-entry { margin-left:auto; display:flex; align-items:center; gap:4px; }
         .header .key-entry input {
             font-size:10px; font-family:'SF Mono','Fira Code',monospace;
-            color:var(--muted); background:rgba(255,255,255,0.5); border:1px solid var(--glass-border);
+            color:var(--muted); background:var(--input-bg); border:1px solid var(--card-border, var(--glass-border));
             padding:3px 8px; border-radius:6px; width:110px; outline:none; backdrop-filter:blur(4px);
         }
-        .header .key-entry input:focus { border-color:var(--cyan); color:var(--text); background:rgba(255,255,255,0.7); }
+        .header .key-entry input:focus { border-color:var(--cyan); color:var(--text); background:var(--input-bg-focus); }
         .header .key-entry .kbtn {
-            font-size:10px; padding:3px 6px; border:1px solid var(--glass-border);
-            border-radius:6px; background:rgba(255,255,255,0.3); cursor:pointer; color:var(--dim); backdrop-filter:blur(4px);
+            font-size:10px; padding:3px 6px; border:1px solid var(--card-border, var(--glass-border));
+            border-radius:6px; background:var(--card-bg, rgba(255,255,255,0.3)); cursor:pointer; color:var(--dim); backdrop-filter:blur(4px);
         }
-        .header .key-entry .kbtn:hover { color:var(--cyan); border-color:var(--cyan); background:rgba(8,145,178,0.08); }
+        .header .key-entry .kbtn:hover { color:var(--cyan); border-color:var(--cyan); background:var(--cyan-glow); }
 
         .sub-row { display:flex; gap:8px; flex-wrap:wrap; font-size:11px; color:var(--dim); margin-bottom:16px; margin-left:18px; }
         .sub-row .pill {
-            background: var(--glass);
+            background: var(--card-bg, var(--glass));
             backdrop-filter: blur(12px) saturate(1.3);
             -webkit-backdrop-filter: blur(12px) saturate(1.3);
-            border: 1px solid var(--glass-border);
+            border: 1px solid var(--card-border, var(--glass-border));
             padding: 3px 12px; border-radius: 20px; color: var(--muted);
         }
         .sub-row .pill strong { color: var(--text-secondary); font-weight:500; }
 
-        .toast { background:rgba(254,202,202,0.7); backdrop-filter:blur(12px); border:1px solid rgba(254,202,202,0.5); border-radius:12px; padding:8px 14px; color:var(--red); font-size:12px; margin-bottom:14px; display:none; }
+        .toast { background:rgba(254,202,202,0.7); backdrop-filter:blur(12px); border:1px solid var(--card-border, rgba(254,202,202,0.5)); border-radius:12px; padding:8px 14px; color:var(--red); font-size:12px; margin-bottom:14px; display:none; }
         .toast.show { display:block; }
 
         .btn-refresh {
             display:flex; align-items:center; justify-content:center; gap:8px;
             width:100%; margin-bottom:14px; padding:14px 24px;
             border-radius: var(--radius-sm);
-            background: var(--glass);
+            background: var(--card-bg, var(--glass));
             backdrop-filter: blur(20px) saturate(1.4);
             -webkit-backdrop-filter: blur(20px) saturate(1.4);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--card-border, var(--glass-border));
+            box-shadow: var(--card-shadow, var(--glass-shadow));
             color: var(--cyan);
             cursor:pointer; font-size:15px; font-weight:600;
             transition:all 0.2s; font-family:inherit;
@@ -135,11 +196,11 @@
         .btn-refresh:active { transform:scale(0.98); }
 
         .remain-hero {
-            background: var(--glass);
+            background: var(--card-bg, var(--glass));
             backdrop-filter: blur(24px) saturate(1.5);
             -webkit-backdrop-filter: blur(24px) saturate(1.5);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--card-border, var(--glass-border));
+            box-shadow: var(--card-shadow, var(--glass-shadow));
             border-radius: var(--radius-lg);
             padding: 28px 28px 24px;
             margin-bottom:16px; text-align:center; position:relative; overflow:hidden;
@@ -147,7 +208,7 @@
         .remain-hero::before {
             content:''; position:absolute; top:-30px; right:-30px;
             width:100px; height:100px; border-radius:50%;
-            background:rgba(8,145,178,0.06); pointer-events:none;
+            background:var(--cyan-glow); pointer-events:none;
         }
         .remain-hero .rh-label { font-size:11px; text-transform:uppercase; letter-spacing:2px; color:var(--cyan); font-weight:700; position:relative; z-index:1; }
         .remain-hero .rh-row {
@@ -166,27 +227,27 @@
         .gauge-row { display:flex; gap:10px; margin-bottom:14px; align-items:stretch; }
         .donut-box {
             flex:0 0 100px;
-            background: var(--glass);
+            background: var(--card-bg, var(--glass));
             backdrop-filter: blur(20px) saturate(1.4);
             -webkit-backdrop-filter: blur(20px) saturate(1.4);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--card-border, var(--glass-border));
+            box-shadow: var(--card-shadow, var(--glass-shadow));
             border-radius: var(--radius);
             padding:14px 10px; display:flex; flex-direction:column; align-items:center; justify-content:center;
         }
         .donut-box svg { width:66px; height:66px; transform:rotate(-90deg); }
-        .donut-box .bg-ring { fill:none; stroke:rgba(255,255,255,0.3); stroke-width:6; }
+        .donut-box .bg-ring { fill:none; stroke:var(--bar-bg); stroke-width:6; }
         .donut-box .fg-ring { fill:none; stroke-width:6; stroke-linecap:round; transition:stroke-dashoffset 0.6s,stroke 0.6s; }
         .donut-box .donut-label { font-size:10px; color:var(--dim); margin-top:4px; }
         .donut-box .donut-label span { color:var(--text-secondary); font-weight:600; }
 
         .stat-grid { flex:1; display:grid; grid-template-columns:1fr 1fr; gap:6px; }
         .s-card {
-            background: var(--glass);
+            background: var(--card-bg, var(--glass));
             backdrop-filter: blur(16px) saturate(1.3);
             -webkit-backdrop-filter: blur(16px) saturate(1.3);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--card-border, var(--glass-border));
+            box-shadow: var(--card-shadow, var(--glass-shadow));
             border-radius: var(--radius-sm);
             padding:10px 14px;
         }
@@ -197,18 +258,18 @@
         .charts-row { display:flex; gap:10px; margin-bottom:14px; }
         .charts-row .ch-card {
             flex:1;
-            background: var(--glass);
+            background: var(--card-bg, var(--glass));
             backdrop-filter: blur(20px) saturate(1.4);
             -webkit-backdrop-filter: blur(20px) saturate(1.4);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--card-border, var(--glass-border));
+            box-shadow: var(--card-shadow, var(--glass-shadow));
             border-radius: var(--radius);
             padding:14px 16px 12px;
         }
         .charts-row .ch-card .ch-label { font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
         .charts-row .ch-card .ch-label span { color:var(--text-secondary); font-weight:600; }
 
-        .big-bar { display:flex; height:38px; border-radius:10px; overflow:hidden; background:rgba(255,255,255,0.3); }
+        .big-bar { display:flex; height:38px; border-radius:10px; overflow:hidden; background:var(--bar-bg); }
         .big-bar .seg { display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; transition:width 0.6s ease; min-width:0; }
         .big-bar .seg.used { background:linear-gradient(135deg,#2563eb,#3b82f6); }
         .big-bar .seg.remain { background:linear-gradient(135deg,#059669,#22c55e); }
@@ -218,7 +279,7 @@
 
         .stack-row { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
         .stack-row .sl { font-size:10px; color:var(--dim); width:48px; flex-shrink:0; }
-        .stack-row .sr { flex:1; height:22px; background:rgba(255,255,255,0.25); border-radius:6px; overflow:hidden; display:flex; }
+        .stack-row .sr { flex:1; height:22px; background:var(--bar-bg); border-radius:6px; overflow:hidden; display:flex; }
         .stack-row .sr .sb { display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:600; color:#fff; transition:width .5s; }
         .stack-row .sr .sb.blue { background:#3b82f6; }
         .stack-row .sr .sb.orange { background:#f59e0b; }
@@ -229,11 +290,11 @@
         .insight-row { display:flex; gap:8px; margin-bottom:12px; }
         .in-card {
             flex:1;
-            background: var(--glass);
+            background: var(--card-bg, var(--glass));
             backdrop-filter: blur(16px) saturate(1.3);
             -webkit-backdrop-filter: blur(16px) saturate(1.3);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--card-border, var(--glass-border));
+            box-shadow: var(--card-shadow, var(--glass-shadow));
             border-radius: var(--radius-sm);
             padding:12px 14px;
         }
@@ -245,11 +306,11 @@
 
         .tbar {
             display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-            background: var(--glass);
+            background: var(--card-bg, var(--glass));
             backdrop-filter: blur(20px) saturate(1.4);
             -webkit-backdrop-filter: blur(20px) saturate(1.4);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--card-border, var(--glass-border));
+            box-shadow: var(--card-shadow, var(--glass-shadow));
             border-radius: var(--radius-sm);
             padding:10px 16px; margin-bottom:14px;
         }
@@ -264,6 +325,71 @@
             .insight-row { flex-direction:column; }
             .charts-row { flex-direction:column; }
         }
+
+        /* settings panel */
+        .settings-overlay {
+            position: fixed; inset:0; z-index:999;
+            background:rgba(0,0,0,0.3); backdrop-filter:blur(4px);
+            opacity:0; visibility:hidden; transition:all 0.25s;
+        }
+        .settings-overlay.open { opacity:1; visibility:visible; }
+        .settings-panel {
+            position:fixed; top:0; right:-320px; width:300px; height:100vh;
+            z-index:1000; padding:24px 20px;
+            background: var(--card-bg, var(--glass));
+            backdrop-filter: blur(24px) saturate(1.5);
+            -webkit-backdrop-filter: blur(24px) saturate(1.5);
+            border-left: 1px solid var(--card-border, var(--glass-border));
+            box-shadow: -4px 0 24px rgba(0,0,0,0.1);
+            transition:right 0.3s cubic-bezier(.22,1,.36,1);
+            overflow-y:auto;
+        }
+        .settings-panel.open { right:0; }
+        .settings-panel .sp-h { display:flex; align-items:center; gap:8px; margin-bottom:20px; }
+        .settings-panel .sp-h h2 { font-size:15px; font-weight:700; color:var(--text); }
+        .settings-panel .sp-h .sp-close {
+            margin-left:auto; font-size:18px; cursor:pointer; color:var(--dim);
+            width:28px; height:28px; display:flex; align-items:center; justify-content:center;
+            border-radius:8px; border:1px solid var(--card-border, var(--glass-border));
+            background:var(--card-bg, rgba(255,255,255,0.15));
+        }
+        .settings-panel .sp-h .sp-close:hover { color:var(--text); background:rgba(0,0,0,0.05); }
+        .sp-group { margin-bottom:18px; }
+        .sp-group .sg-label { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--dim); margin-bottom:8px; font-weight:600; }
+        .sp-opt { display:flex; gap:6px; flex-wrap:wrap; }
+        .sp-opt .so-btn {
+            padding:6px 14px; border-radius:8px; font-size:12px; cursor:pointer;
+            border:1px solid var(--card-border, var(--glass-border));
+            background:var(--card-bg, rgba(255,255,255,0.15));
+            color:var(--muted); transition:all 0.15s; font-family:inherit;
+        }
+        .sp-opt .so-btn:hover { border-color:var(--cyan); color:var(--text); }
+        .sp-opt .so-btn.active { background:var(--cyan); color:#fff; border-color:var(--cyan); }
+        .sp-toggle { display:flex; align-items:center; gap:10px; padding:6px 0; }
+        .sp-toggle .st-label { font-size:13px; color:var(--text-secondary); flex:1; }
+        .sp-toggle input[type="checkbox"] {
+            width:36px; height:20px; border-radius:10px; border:1px solid var(--card-border, var(--glass-border));
+            background:var(--bar-bg); appearance:none; cursor:pointer; position:relative; transition:all 0.2s;
+            flex-shrink:0;
+        }
+        .sp-toggle input[type="checkbox"]::after {
+            content:''; position:absolute; top:2px; left:2px; width:14px; height:14px;
+            border-radius:50%; background:var(--dim); transition:all 0.2s;
+        }
+        .sp-toggle input[type="checkbox"]:checked { background:var(--cyan); border-color:var(--cyan); }
+        .sp-toggle input[type="checkbox"]:checked::after { left:18px; background:#fff; }
+
+        /* inline SVG icon styles */
+        .icon-svg { width:14px; height:14px; display:inline-block; vertical-align:middle; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+        .icon-svg-sm { width:12px; height:12px; display:inline-block; vertical-align:middle; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+        .icon-svg-lg { width:18px; height:18px; display:inline-block; vertical-align:middle; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+
+        .title-input {
+            border:none; background:transparent; font-size:17px; font-weight:700;
+            color:var(--text); font-family:inherit; outline:none; cursor:text; width:auto;
+            border-bottom:1px dashed transparent; transition:border-color 0.2s;
+        }
+        .title-input:focus { border-bottom-color:var(--cyan); }
     </style>
 </head>
 <body>
@@ -271,25 +397,33 @@
 
 <div class="header">
     <div class="dot ok" id="statusDot"></div>
-    <h1>Token 用量監控</h1>
+    <input class="title-input" id="titleInput" value="Token 用量監控" spellcheck="false" maxlength="30" />
     <div class="key-entry">
         <input type="password" id="apiKeyInput" placeholder="API Key" spellcheck="false" />
-        <button class="kbtn" onclick="sk()" title="儲存">💾</button>
+        <button class="kbtn" onclick="sk()" title="儲存">
+            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        </button>
+        <button class="kbtn" onclick="toggleSettings()" title="設定">
+            <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
     </div>
 </div>
 <div class="sub-row">
-    <span class="pill">🔑 <strong id="tokenName">--</strong></span>
-    <span class="pill" id="lastRefreshPill" style="font-size:9px;color:var(--dim);">上次: --</span>
-    <a href="https://github.com/ricehung29/yuanyuai-quota-skill" target="_blank" style="margin-left:auto;display:inline-flex;align-items:center;"><img src="https://img.shields.io/badge/-181717?logo=github&style=flat" alt="GitHub" style="height:14px;vertical-align:middle;opacity:0.5;transition:opacity.15s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5"></a>
+    <span class="pill"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="color:var(--dim);margin-right:2px;"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> <strong id="tokenName">--</strong></span>
+    <span class="pill"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="color:var(--dim);margin-right:2px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <span id="lastRefreshPill" style="font-size:12px;">--</span></span>
+    <a href="https://github.com/ricehung29/yuanyuai-quota-skill" target="_blank" style="margin-left:auto;display:inline-flex;align-items:center;">
+        <svg class="icon-svg" viewBox="0 0 24 24" style="opacity:0.5;transition:opacity.15s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+    </a>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <button class="btn-refresh" onclick="f()" id="btnRefresh">
-    🔄 重新整理
+    <svg class="icon-svg" viewBox="0 0 24 24" style="color:currentColor;"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    重新整理
 </button>
 
-<div class="remain-hero">
+<div class="remain-hero" id="remainHero">
     <div class="rh-label">剩餘額度</div>
     <div class="rh-row" onclick="toggleDisplay()" title="點擊切換百分比/次數">
         <span class="big-pct" id="bigDisplay">--</span>
@@ -298,7 +432,7 @@
     <div class="rh-sub">／ <strong id="bigLimit">--</strong> 次總額度 · 已用 <strong id="bigUsed">--</strong> 次</div>
 </div>
 
-<div class="gauge-row">
+<div class="gauge-row" id="gaugeRow">
     <div class="donut-box">
         <svg viewBox="0 0 66 66"><circle class="bg-ring" cx="33" cy="33" r="28"/><circle class="fg-ring" id="donutArc" cx="33" cy="33" r="28" stroke-dasharray="175.93" stroke-dashoffset="175.93"/></svg>
         <div class="donut-label">使用 <span id="donutPct">--</span></div>
@@ -311,14 +445,14 @@
     </div>
 </div>
 
-<div class="charts-row">
+<div class="charts-row" id="chartsRow">
     <div class="ch-card">
-        <div class="ch-label">📊 額度使用 <span>實際 vs 計費</span></div>
+        <div class="ch-label"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="color:var(--dim);margin-right:2px;"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> 額度使用 <span>實際 vs 計費</span></div>
         <div class="big-bar"><div class="seg used" id="segBilled" style="width:0%"></div><div class="seg remain" id="segRemain" style="width:100%"></div></div>
         <div class="big-bar-labels"><span class="lb"><span class="sw" style="background:#3b82f6;"></span> 已用 <span id="chartUsed">--</span></span><span class="lb"><span class="sw" style="background:#059669;"></span> 剩餘 <span id="chartRemain">--</span></span></div>
     </div>
     <div class="ch-card">
-        <div class="ch-label">📈 倍率影響 <span>計費 vs 實際</span></div>
+        <div class="ch-label"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="color:var(--dim);margin-right:2px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> 倍率影響 <span>計費 vs 實際</span></div>
         <div class="stack-row"><span class="sl">計費</span><div class="sr"><div class="sb blue" id="stackB" style="width:100%"></div></div><span class="sv" id="stackBVal">--</span></div>
         <div class="stack-row"><span class="sl">實際</span><div class="sr"><div class="sb green" id="stackR" style="width:100%"></div></div><span class="sv" id="stackRVal">--</span></div>
         <div class="stack-row"><span class="sl">加成</span><div class="sr"><div class="sb orange" id="stackM" style="width:0%"></div></div><span class="sv" id="stackMVal">--</span></div>
@@ -326,22 +460,72 @@
     </div>
 </div>
 
-<div class="insight-row">
-    <div class="in-card ok" id="insight1"><div class="it">📊 摘要</div><div class="ib">載入中...</div></div>
-    <div class="in-card ok" id="insight2"><div class="it">⏳ 預估</div><div class="ib">載入中...</div></div>
+<div class="insight-row" id="insightRow">
+    <div class="in-card ok" id="insight1"><div class="it"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="color:var(--dim);margin-right:2px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> 摘要</div><div class="ib">載入中...</div></div>
+    <div class="in-card ok" id="insight2"><div class="it"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="color:var(--dim);margin-right:2px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 預估</div><div class="ib">載入中...</div></div>
 </div>
 
-<div class="tbar">
-    <div class="tbit">⏱ 重置 <span class="tv" id="resetTime">--</span></div>
-    <div class="tbit">📅 到期 <span class="tv" id="expiryTime">--</span></div>
-    <div class="tbit">📊 倍率 <span class="tv" id="multiplierLabel">--</span></div>
+<div class="tbar" id="tbar">
+    <div class="tbit"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="color:var(--dim);margin-right:1px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 重置 <span class="tv" id="resetTime">--</span></div>
+    <div class="tbit"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="color:var(--dim);margin-right:1px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 到期 <span class="tv" id="expiryTime">--</span></div>
+    <div class="tbit"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="color:var(--dim);margin-right:1px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> 倍率 <span class="tv" id="multiplierLabel">--</span></div>
     <div class="cntdown" id="countdown">--</div>
 </div>
 
 </div>
 
+<!-- settings overlay + panel -->
+<div class="settings-overlay" id="settingsOverlay" onclick="toggleSettings()"></div>
+<div class="settings-panel" id="settingsPanel">
+    <div class="sp-h">
+        <h2><svg class="icon-svg" viewBox="0 0 24 24" style="margin-right:4px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> 設定</h2>
+        <div class="sp-close" onclick="toggleSettings()">✕</div>
+    </div>
+    <div class="sp-group">
+        <div class="sg-label"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="margin-right:2px;"><circle cx="12" cy="12" r="10"/><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> 深色模式</div>
+        <div class="sp-opt" id="darkModeOpts">
+            <button class="so-btn" data-v="light">淺色</button>
+            <button class="so-btn" data-v="dark">深色</button>
+            <button class="so-btn" data-v="system">系統</button>
+        </div>
+    </div>
+    <div class="sp-group">
+        <div class="sg-label"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="margin-right:2px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg> 主題</div>
+        <div class="sp-opt" id="themeOpts">
+            <button class="so-btn" data-v="glass">Liquid Glass</button>
+            <button class="so-btn" data-v="normal">Normal</button>
+        </div>
+    </div>
+    <div class="sp-group">
+        <div class="sg-label"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="margin-right:2px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> API Key</div>
+        <div style="display:flex;gap:6px;margin-bottom:6px;">
+            <input type="password" id="settingsKeyInput" placeholder="sk-xxxxx" spellcheck="false" style="flex:1;font-size:11px;font-family:'SF Mono','Fira Code',monospace;color:var(--text);background:var(--input-bg);border:1px solid var(--card-border, var(--glass-border));padding:6px 10px;border-radius:6px;outline:none;" />
+            <button class="so-btn" onclick="skFromSettings()" style="padding:6px 12px;">儲存</button>
+        </div>
+        <div class="sp-toggle"><span class="st-label"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="margin-right:2px;"><circle cx="12" cy="12" r="10"/></svg> 完整 AI Badge</span><input type="checkbox" id="showFullBadge" checked></div>
+    </div>
+    <div class="sp-group">
+        <div class="sg-label"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="margin-right:2px;"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> 自動刷新</div>
+        <div class="sp-opt" id="refreshIntervalOpts">
+            <button class="so-btn" data-v="30">30s</button>
+            <button class="so-btn" data-v="60">1m</button>
+            <button class="so-btn" data-v="120">2m</button>
+            <button class="so-btn" data-v="300">5m</button>
+            <button class="so-btn" data-v="0">關閉</button>
+        </div>
+    </div>
+    <div class="sp-group">
+        <div class="sg-label"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="margin-right:2px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> 顯示區塊</div>
+        <div class="sp-toggle"><span class="st-label">額度面板</span><input type="checkbox" id="shHero" checked></div>
+        <div class="sp-toggle"><span class="st-label">儀表板</span><input type="checkbox" id="shGauge" checked></div>
+        <div class="sp-toggle"><span class="st-label">圖表</span><input type="checkbox" id="shCharts" checked></div>
+        <div class="sp-toggle"><span class="st-label">分析</span><input type="checkbox" id="shInsights" checked></div>
+        <div class="sp-toggle"><span class="st-label">工具列</span><input type="checkbox" id="shToolbar" checked></div>
+    </div>
+</div>
+
 <script>
-const API='https://yuanyuaicloud.cn', DONUT=2*Math.PI*28, SK='yuanyuai_api_key';
+const API='https://yuanyuaicloud.cn', DONUT=2*Math.PI*28, SK='yuanyuai_api_key', TS='yuanyuai_title';
 function gk(){return localStorage.getItem(SK);}
 function sk(){
     const i=document.getElementById('apiKeyInput'), r=i.value.trim();
@@ -350,7 +534,25 @@ function sk(){
     localStorage.setItem(SK,k); i.value=k; i.style.color='#059669'; f();
     setTimeout(()=>i.style.color='',1500);
 }
-(function(){const i=document.getElementById('apiKeyInput');i.value=gk();i.addEventListener('keydown',e=>{if(e.key==='Enter')sk();});const params=new URLSearchParams(window.location.search);const qk=params.get('key');if(qk){i.value=qk;sk();}})();
+function skFromSettings(){
+    const i=document.getElementById('settingsKeyInput'), r=i.value.trim();
+    if(!r)return; let k=r;
+    if(!k.toLowerCase().startsWith('sk-'))k='sk-'+k;
+    localStorage.setItem(SK,k);
+    document.getElementById('apiKeyInput').value=k;
+    i.value=''; f();
+}
+(function(){
+    const i=document.getElementById('apiKeyInput');
+    i.value=gk();
+    i.addEventListener('keydown',e=>{if(e.key==='Enter')sk();});
+    const params=new URLSearchParams(window.location.search);
+    const qk=params.get('key');
+    if(qk){i.value=qk;sk();}
+    // restore title
+    const savedTitle=localStorage.getItem(TS);
+    if(savedTitle)document.getElementById('titleInput').value=savedTitle;
+})();
 
 let ld=null,dispMode='pct';
 function toggleDisplay(){dispMode=dispMode==='pct'?'count':'pct';if(ld)render(ld);}
@@ -372,19 +574,22 @@ function st(id,t){const e=document.getElementById(id);if(e)e.textContent=t||'--'
 
 async function f(){
     const b=document.getElementById('btnRefresh');
-    b.innerHTML='⏳ 查詢中...'; b.disabled=true;
+    b.innerHTML='<svg class="icon-svg" viewBox="0 0 24 24" style="color:currentColor;animation:spin 0.8s linear infinite;"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> 查詢中...'; b.disabled=true;
     try{
         let k=gk(); if(k.toLowerCase().startsWith('sk-'))k=k.substring(3);
         const r=await fetch(API+'/api/query-quota',{headers:{'Authorization':'Bearer '+k,'Content-Type':'application/json'}});
         const j=await r.json();
         if(!r.ok||!j.success)throw new Error(j.message||'查詢失敗');
         ld=j.data; render(j.data);
-        st('lastRefreshPill','上次: '+new Date().toLocaleTimeString('zh-Hant',{hour:'2-digit',minute:'2-digit',second:'2-digit'}));
+        st('lastRefreshPill',new Date().toLocaleTimeString('zh-Hant',{hour:'2-digit',minute:'2-digit',second:'2-digit'}));
     }catch(e){
         const t=document.getElementById('toast');
         t.textContent='❌ '+e.message; t.classList.add('show');
         setTimeout(()=>t.classList.remove('show'),5000);
-    }finally{b.innerHTML='🔄 重新整理'; b.disabled=false;}
+    }finally{
+        b.innerHTML='<svg class="icon-svg" viewBox="0 0 24 24" style="color:currentColor;"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> 重新整理';
+        b.disabled=false;
+    }
 }
 
 function render(d){
@@ -392,7 +597,8 @@ function render(d){
     updateHero(pct,rm);
     st('bigLimit',fm(rL)); st('bigUsed',fm(b));
     const dot=document.getElementById('statusDot'); dot.className='dot'+(pct>=90?' danger':pct>=65?' warn':' ok');
-    st('tokenName',d.name||d.key||gk());
+    const badgeText=settings.showFullBadge?(d.name||d.key||gk())+' · glm-5.2':(d.name||d.key||gk());
+    st('tokenName',badgeText);
     st('donutPct',pct.toFixed(0)+'%');
     const arc=document.getElementById('donutArc'); arc.setAttribute('stroke-dashoffset',DONUT*(1-pct/100)); arc.setAttribute('stroke',pct>=90?'#dc2626':pct>=65?'#d97706':'#059669');
     st('billedCalls',fm(b)); st('realCalls',fm(re)); st('multiplierDisplay','×'+mul); st('multiplierCost','+'+fm(mI));
@@ -430,12 +636,98 @@ function CD(ts){
     st('countdown',str);st('countdownSmall',str);
 }
 
+// settings
+const SS='yuanyuai_settings';
+function ds(){return JSON.parse(localStorage.getItem(SS)||'{}');}
+function ws(s){localStorage.setItem(SS,JSON.stringify(s));}
+const defSettings={darkMode:'system',theme:'glass',show:{hero:true,gauge:true,charts:true,insights:true,toolbar:true},refreshInterval:60,showFullBadge:true};
+let settings=Object.assign({},defSettings,ds());
+let refreshTimer=null;
+
+function applyTheme(){
+    const h=document.documentElement;
+    if(settings.darkMode==='dark')h.classList.add('dark');
+    else if(settings.darkMode==='light')h.classList.remove('dark');
+    else {
+        const mq=window.matchMedia('(prefers-color-scheme:dark)');
+        mq.matches?h.classList.add('dark'):h.classList.remove('dark');
+    }
+    if(settings.theme==='normal')h.classList.add('normal');
+    else h.classList.remove('normal');
+}
+function applyVisibility(){
+    const h=document.getElementById('remainHero'),g=document.getElementById('gaugeRow'),
+          ch=document.getElementById('chartsRow'),i=document.getElementById('insightRow'),
+          t=document.getElementById('tbar');
+    if(h)h.style.display=settings.show.hero?'':'none';
+    if(g)g.style.display=settings.show.gauge?'':'none';
+    if(ch)ch.style.display=settings.show.charts?'':'none';
+    if(i)i.style.display=settings.show.insights?'':'none';
+    if(t)t.style.display=settings.show.toolbar?'':'none';
+}
+function applyRefreshInterval(){
+    if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null;}
+    if(settings.refreshInterval>0){
+        refreshTimer=setInterval(f,settings.refreshInterval*1000);
+    }
+}
+function initSettingsUI(){
+    const dm=document.getElementById('darkModeOpts');
+    dm.querySelectorAll('.so-btn').forEach(b=>{
+        b.classList.toggle('active',b.dataset.v===settings.darkMode);
+        b.onclick=()=>{settings.darkMode=b.dataset.v;ws(settings);applyTheme();dm.querySelectorAll('.so-btn').forEach(x=>x.classList.toggle('active',x.dataset.v===settings.darkMode));};
+    });
+    const th=document.getElementById('themeOpts');
+    th.querySelectorAll('.so-btn').forEach(b=>{
+        b.classList.toggle('active',b.dataset.v===settings.theme);
+        b.onclick=()=>{settings.theme=b.dataset.v;ws(settings);applyTheme();th.querySelectorAll('.so-btn').forEach(x=>x.classList.toggle('active',x.dataset.v===settings.theme));};
+    });
+    const ri=document.getElementById('refreshIntervalOpts');
+    ri.querySelectorAll('.so-btn').forEach(b=>{
+        b.classList.toggle('active',Number(b.dataset.v)===settings.refreshInterval);
+        b.onclick=()=>{settings.refreshInterval=Number(b.dataset.v);ws(settings);applyRefreshInterval();ri.querySelectorAll('.so-btn').forEach(x=>x.classList.toggle('active',Number(x.dataset.v)===settings.refreshInterval));};
+    });
+    const fb=document.getElementById('showFullBadge');
+    fb.checked=settings.showFullBadge;
+    fb.onchange=()=>{settings.showFullBadge=fb.checked;ws(settings);if(ld)render(ld);};
+    ['hero','gauge','charts','insights','toolbar'].forEach(k=>{
+        const el=document.getElementById('sh'+k.charAt(0).toUpperCase()+k.slice(1));
+        if(!el)return;
+        el.checked=settings.show[k];
+        el.onchange=()=>{settings.show[k]=el.checked;ws(settings);applyVisibility();};
+    });
+}
+function toggleSettings(){
+    document.getElementById('settingsOverlay').classList.toggle('open');
+    document.getElementById('settingsPanel').classList.toggle('open');
+}
+// title editing
+document.getElementById('titleInput').addEventListener('blur',function(){
+    localStorage.setItem(TS,this.value);
+});
+document.getElementById('titleInput').addEventListener('keydown',function(e){
+    if(e.key==='Enter')this.blur();
+});
+
+// listen for system dark mode changes
+window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',applyTheme);
+
+applyTheme();
+applyVisibility();
+applyRefreshInterval();
+initSettingsUI();
+
+// spin animation
+const styleSheet=document.createElement('style');
+styleSheet.textContent='@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+document.head.appendChild(styleSheet);
+
 setInterval(()=>{if(ld)CD(ld.nextResetTime);},500);
-setInterval(f,60000);f();
+f();
 
 (function(){
     const m={
-        name:'YuanyuAI Token 監控',short_name:'Token 監控',
+        name:localStorage.getItem(TS)||'YuanyuAI Token 監控',short_name:'Token 監控',
         start_url:window.location.href.split('?')[0],display:'standalone',
         background_color:'#e0e7ff',theme_color:'#e0e7ff',
         icons:[{src:'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="36" fill="#e0e7ff"/><circle cx="96" cy="78" r="44" fill="none" stroke="#0891b2" stroke-width="7"/><text x="96" y="86" text-anchor="middle" fill="#1e293b" font-size="26" font-weight="800">'+(ld?Math.min(100,(ld.billedCalls||0)/(ld.rateLimit||3000)*100).toFixed(0):'--')+'%</text><text x="96" y="144" text-anchor="middle" fill="#475569" font-size="14" font-weight="500">剩餘 '+(ld?fm(Math.max(0,ld.windowRemain||0)):'--')+'</text></svg>'),sizes:'192x192',type:'image/svg+xml'}]
