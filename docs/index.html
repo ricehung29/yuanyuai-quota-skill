@@ -399,10 +399,6 @@
     <div class="dot ok" id="statusDot"></div>
     <input class="title-input" id="titleInput" value="Token 用量監控" spellcheck="false" maxlength="30" />
     <div class="key-entry">
-        <input type="password" id="apiKeyInput" placeholder="API Key" spellcheck="false" />
-        <button class="kbtn" onclick="sk()" title="儲存">
-            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-        </button>
         <button class="kbtn" onclick="toggleSettings()" title="設定">
             <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
@@ -411,9 +407,6 @@
 <div class="sub-row">
     <span class="pill"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="color:var(--dim);margin-right:2px;"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> <strong id="tokenName">--</strong></span>
     <span class="pill"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="color:var(--dim);margin-right:2px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <span id="lastRefreshPill" style="font-size:12px;">--</span></span>
-    <a href="https://github.com/ricehung29/yuanyuai-quota-skill" target="_blank" style="margin-left:auto;display:inline-flex;align-items:center;">
-        <svg class="icon-svg" viewBox="0 0 24 24" style="opacity:0.5;transition:opacity.15s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-    </a>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -499,8 +492,8 @@
     <div class="sp-group">
         <div class="sg-label"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="margin-right:2px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> API Key</div>
         <div style="display:flex;gap:6px;margin-bottom:6px;">
-            <input type="password" id="settingsKeyInput" placeholder="sk-xxxxx" spellcheck="false" style="flex:1;font-size:11px;font-family:'SF Mono','Fira Code',monospace;color:var(--text);background:var(--input-bg);border:1px solid var(--card-border, var(--glass-border));padding:6px 10px;border-radius:6px;outline:none;" />
-            <button class="so-btn" onclick="skFromSettings()" style="padding:6px 12px;">儲存</button>
+            <input type="password" id="apiKeyInput" placeholder="sk-xxxxx" spellcheck="false" style="flex:1;font-size:11px;font-family:'SF Mono','Fira Code',monospace;color:var(--text);background:var(--input-bg);border:1px solid var(--card-border, var(--glass-border));padding:6px 10px;border-radius:6px;outline:none;" />
+            <button class="so-btn" onclick="sk()" style="padding:6px 12px;">儲存</button>
         </div>
         <div class="sp-toggle"><span class="st-label"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="margin-right:2px;"><circle cx="12" cy="12" r="10"/></svg> 完整 AI Badge</span><input type="checkbox" id="showFullBadge" checked></div>
     </div>
@@ -515,8 +508,13 @@
         </div>
     </div>
     <div class="sp-group">
+        <div class="sg-label"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="margin-right:2px;"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg> GitHub</div>
+        <div style="padding:4px 0;">
+            <a href="https://github.com/ricehung29/yuanyuai-quota-skill" target="_blank" style="font-size:12px;color:var(--cyan);text-decoration:none;">ricehung29/yuanyuai-quota-skill ↗</a>
+        </div>
+    </div>
+    <div class="sp-group">
         <div class="sg-label"><svg class="icon-svg-sm" viewBox="0 0 24 24" style="margin-right:2px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> 顯示區塊</div>
-        <div class="sp-toggle"><span class="st-label">額度面板</span><input type="checkbox" id="shHero" checked></div>
         <div class="sp-toggle"><span class="st-label">儀表板</span><input type="checkbox" id="shGauge" checked></div>
         <div class="sp-toggle"><span class="st-label">圖表</span><input type="checkbox" id="shCharts" checked></div>
         <div class="sp-toggle"><span class="st-label">分析</span><input type="checkbox" id="shInsights" checked></div>
@@ -531,25 +529,13 @@ function sk(){
     const i=document.getElementById('apiKeyInput'), r=i.value.trim();
     if(!r)return; let k=r;
     if(!k.toLowerCase().startsWith('sk-'))k='sk-'+k;
-    localStorage.setItem(SK,k); i.value=k; i.style.color='#059669'; f();
+    localStorage.setItem(SK,k); i.style.color='#059669'; f();
     setTimeout(()=>i.style.color='',1500);
-}
-function skFromSettings(){
-    const i=document.getElementById('settingsKeyInput'), r=i.value.trim();
-    if(!r)return; let k=r;
-    if(!k.toLowerCase().startsWith('sk-'))k='sk-'+k;
-    localStorage.setItem(SK,k);
-    document.getElementById('apiKeyInput').value=k;
-    i.value=''; f();
 }
 (function(){
     const i=document.getElementById('apiKeyInput');
     i.value=gk();
     i.addEventListener('keydown',e=>{if(e.key==='Enter')sk();});
-    const params=new URLSearchParams(window.location.search);
-    const qk=params.get('key');
-    if(qk){i.value=qk;sk();}
-    // restore title
     const savedTitle=localStorage.getItem(TS);
     if(savedTitle)document.getElementById('titleInput').value=savedTitle;
 })();

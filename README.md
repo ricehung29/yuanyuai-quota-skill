@@ -8,9 +8,12 @@
 
 ## What's New
 
+- **Settings Panel** — 設定面板加入 API Key 管理、完整 AI Badge toggle、自動刷新間隔、深色模式、主題切換、顯示區塊控制
+- **Editable Title** — 標題可點擊編輯，自動儲存
+- **SVG Icons** — 全面取代 emoji 作圖標，更清晰一致
+- **Liquid Glass UI** — Web UI 改為全玻璃質感主題，背景漸變＋毛玻璃卡片
 - **Web UI** — 即開即用嘅用量監控面板，支援 `?key=` 快速查詢
 - **GitHub Pages** — [`ricehung.github.io/yuanyuai-quota-skill/`](https://ricehung.github.io/yuanyuai-quota-skill/)
-- **Liquid Glass UI** — Web UI 改為全玻璃質感主題，背景漸變＋毛玻璃卡片
 
 ## Features
 
