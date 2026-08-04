@@ -2,6 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+> ⚠️ **Archived** — YuanyuAI 已將 API CORS 鎖定為同源，第三方頁面（包括 GitHub Pages）無法再跨域查詢用量。**請改用官方面板：https://yuanyuaicloud.cn/query-quota**
+
 > Claude Code skill for monitoring YuanyuAI API key usage (rate limit / quota)
 
 即時查詢 YuanyuAI API Key 嘅用量限制，支援自動用量提醒。
