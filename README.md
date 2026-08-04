@@ -130,11 +130,13 @@ git clone https://github.com/ricehung/yuanyuai-quota-skill.git .claude/skills/yu
 
 ## Web UI (GitHub Pages)
 
+> ⚠️ **Deprecated** — YuanyuAI 已啟用 `strict-origin-when-cross-origin` 並將 CORS `Access-Control-Allow-Origin` 鎖定為 `https://yuanyuaicloud.cn`，第三方 domain 嘅瀏覽器請求已被阻止。Web UI 面板已無法正常運作。
+
 即開即用嘅用量監控面板：[`https://ricehung.github.io/yuanyuai-quota-skill/`](https://ricehung.github.io/yuanyuai-quota-skill/)
 
 **快速查詢連結：** `https://ricehung.github.io/yuanyuai-quota-skill/?key=sk-xxxxx`
 
-貼上你的 API Key 即開即用，支援手機 PWA 安裝。
+貼上你的 API Key 即開即用，支援手機 PWA 安裝。**（因 CORS 限制已無法使用）**
 
 ## 安全
 
