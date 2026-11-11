@@ -9,25 +9,25 @@ description: 即時查詢同監控 YuanyuAI API Key 嘅用量限制 (rate limit 
 
 ## 用法
 
-- `/quota` — 查詢已儲存嘅 API Key 用量
-- `/quota sk-xxxxx` — 用指定 Key 查詢
-- `/quota --save sk-xxxxx` — 儲存 Key 並查詢
-- `/quota --check` — 用已儲存 Key 查詢（完整報告）
-- `/quota --oneline` — 單行輸出（百分比 + 速率 + 重置倒數）
-- `/quota --hook` — Hook 模式（用於自動提醒）
-- `/quota --interval 30` — 每 30 秒自動刷新監控
-- `/quota --help` — 顯示完整幫助
+- `/yuanyuai-quota` — 查詢已儲存嘅 API Key 用量
+- `/yuanyuai-quota sk-xxxxx` — 用指定 Key 查詢
+- `/yuanyuai-quota --save sk-xxxxx` — 儲存 Key 並查詢
+- `/yuanyuai-quota --check` — 用已儲存 Key 查詢（完整報告）
+- `/yuanyuai-quota --oneline` — 單行輸出（百分比 + 速率 + 重置倒數）
+- `/yuanyuai-quota --hook` — Hook 模式（用於自動提醒）
+- `/yuanyuai-quota --interval 30` — 每 30 秒自動刷新監控
+- `/yuanyuai-quota --help` — 顯示完整幫助
 
 ## 自動用量提醒（推薦）
 
-設定 `post_tool_use` hook，每次工具呼叫後自動檢查用量：
+設定 `PostToolUse` hook，每次工具呼叫後自動檢查用量：
 
 在 `.claude/settings.local.json` 加入：
 
 ```json
 {
   "hooks": {
-    "post_tool_use": [
+    "PostToolUse": [
       {
         "matcher": "Bash|Edit|Write",
         "hooks": [
@@ -59,27 +59,24 @@ sudo apt install jq bc   # Linux
 ```
 GET https://yuanyuaicloud.cn/api/query-quota
 Authorization: Bearer <api_key_without_sk->
+Content-Type: application/json
 ```
 
-## Web UI (GitHub Pages)
+- 免登入，只查詢此 Key 對應嘅套餐
+- 唔回傳帳號餘額、訂單或其他 Key
+- 官方建議每 30 秒查詢一次（`--interval 30`）
 
-即開即用嘅用量監控面板，唔需要 CLI：
+回傳欄位（`data`）：`name`、`rateLimit`、`billedCalls`、`realCalls`、`windowRemain`、
+`currentMultiplier`、`multiplierLabel`、`nextResetTime`、`expiredTime`，
+以及週限計劃嘅 `weeklyLimit`、`weeklyBilled`、`nextWeeklyReset`、
+`quotaType: "codingplan"`。舊欄位 `windowCalls` 仍可能出現，已用 `billedCalls` 優先。
 
-**網址：** `https://ricehung.github.io/yuanyuai-quota-skill/`
+## Web UI
 
-三種用法：
+官方面板：`https://yuanyuaicloud.cn/query-quota`
 
-1. **直接打開** — 輸入 API Key 後按儲存
-2. **快速查詢** — `https://ricehung.github.io/yuanyuai-quota-skill/?key=sk-xxxxx`（貼上即自動查詢）
-3. **捷徑 bookmarlet** — 瀏覽器網址列貼上 `https://ricehung.github.io/yuanyuai-quota-skill/?key=sk-xxxxx` 一鍵查詢
-
-功能：
-- 用量百分比 + 剩餘次數（點擊切換顯示）
-- 計費 / 實際請求數、倍率影響
-- 消耗速率、預估超限時間
-- 下次重置倒數
-- 每 60 秒自動刷新
-- 支援 PWA 安裝到手機主畫面
+> GitHub Pages 舊面板已停用：API CORS 鎖定為 `https://yuanyuaicloud.cn`，第三方 domain 嘅瀏覽器請求會被封鎖。
+> CLI / skill 用 `curl`，唔受 CORS 限制，繼續可用。
 
 ## Key 儲存位置
 

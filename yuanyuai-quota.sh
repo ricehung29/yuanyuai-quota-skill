@@ -39,6 +39,16 @@ fm() {
     fi
 }
 
+# ---- 百分比（rateLimit 0 = 不限量，避免除零）----
+pct_of() {
+    local used="$1" lim="$2"
+    if (( ${lim:-0} > 0 )); then
+        echo "scale=1; $used * 100 / $lim" | bc 2>/dev/null || echo 0
+    else
+        echo 0
+    fi
+}
+
 # ---- 讀取已儲存 Key ----
 load_key() {
     if [[ -f "$CONFIG_FILE" ]]; then
@@ -133,7 +143,7 @@ render_quota() {
 
     # 計算
     local pct burnRate burnRateNote
-    pct=$(echo "scale=2; $billedCalls * 100 / $rateLimit" | bc 2>/dev/null || echo "0")
+    pct=$(pct_of "$billedCalls" "$rateLimit")
     pct=$(echo "$pct" | awk '{printf "%.1f", $1}')
     local pct_int
     pct_int=$(echo "$pct" | awk '{printf "%d", $1}')
@@ -176,8 +186,12 @@ render_quota() {
     fi
     echo ""
     echo -e "  ${BOLD}剩餘額度${NC}"
-    echo -e "  ${remain_display}${BOLD}$(echo "$pct" | awk '{printf "%3.0f", $1}')%${NC}  剩餘 $(fm "$windowRemain") 次"
-    echo -e "  ${DIM}／ $(fm "$rateLimit") 次總額度 · 已用 $(fm "$billedCalls") 次${NC}"
+    if (( ${rateLimit:-0} > 0 )); then
+        echo -e "  ${remain_display}${BOLD}$(echo "$pct" | awk '{printf "%3.0f", $1}')%${NC}  剩餘 $(fm "$windowRemain") 次"
+        echo -e "  ${DIM}／ $(fm "$rateLimit") 次總額度 · 已用 $(fm "$billedCalls") 次${NC}"
+    else
+        echo -e "  ${GREEN}${BOLD}不限量${NC}  已用 $(fm "$billedCalls") 次"
+    fi
 
     echo ""
     echo -e "  ${BOLD}📊 詳細數據${NC}"
@@ -187,6 +201,22 @@ render_quota() {
     echo -e "  │ 當前倍率             │ $(printf "%-16s" "×${currentMultiplier}") │"
     echo -e "  │ 額外消耗 (加成)      │ $(printf "%-16s" "+$(fm "$mulImpact")") │"
     echo -e "  └──────────────────────┴──────────────────┘"
+
+    # 週限額（只喺有週限計劃先顯示）
+    local weeklyLimit weeklyBilled nextWeeklyReset
+    weeklyLimit=$(echo "$data" | jq -r '.weeklyLimit // 0')
+    if [[ "$weeklyLimit" != "0" && "$weeklyLimit" != "null" ]]; then
+        weeklyBilled=$(echo "$data" | jq -r '.weeklyBilled // 0')
+        local weeklyRemain
+        weeklyRemain=$(echo "$data" | jq -r --argjson lim "$weeklyLimit" --argjson b "$weeklyBilled" '.weeklyRemain // ($lim - $b)')
+        nextWeeklyReset=$(echo "$data" | jq -r '.nextWeeklyReset // 0')
+        echo ""
+        echo -e "  ${BOLD}📅 本週額度${NC}"
+        echo -e "  已用 $(fm "$weeklyBilled") / $(fm "$weeklyLimit") 次 · 剩餘 $(fm "$weeklyRemain") 次"
+        if [[ "$nextWeeklyReset" != "0" && "$nextWeeklyReset" != "null" ]]; then
+            echo -e "  ${DIM}週重置: $(date -r "$nextWeeklyReset" "+%m/%d %H:%M" 2>/dev/null || echo "--")${NC}"
+        fi
+    fi
 
     # 消耗速率
     if [[ "$nextResetTime" != "0" && "$nextResetTime" != "null" ]]; then
@@ -203,10 +233,12 @@ render_quota() {
                 burnRateNote="$(printf "%.0f" "$burn_per_min") 次/分"
             fi
 
-            # 預估總消耗
+            # 預估總消耗（不限量計劃唔比較）
             local estimated_total
             estimated_total=$(echo "scale=0; $billedCalls * 100 / (($elapsed_sec * 100) / (5*3600))" | bc 2>/dev/null || echo "0")
-            if (( estimated_total > rateLimit )); then
+            if (( ${rateLimit:-0} <= 0 )); then
+                burnRateNote="${burnRateNote}  ${DIM}預估 $(fm "$estimated_total") 次${NC}"
+            elif (( estimated_total > rateLimit )); then
                 local over
                 over=$((estimated_total - rateLimit))
                 burnRateNote="${burnRateNote}  ${RED}⚠ 預估超限 +$(fm "$over")${NC}"
@@ -258,6 +290,8 @@ render_quota() {
         echo -e "  ${RED}已消耗 ${pct}%，即將達到上限。目前倍率 ×${currentMultiplier} 加速消耗中。${NC}"
     elif (( $(echo "$pct_int >= 65" | bc -l) )); then
         echo -e "  ${YELLOW}已消耗 ${pct}%。倍率 ×${currentMultiplier}，請留意請求頻率。${NC}"
+    elif (( ${rateLimit:-0} <= 0 )); then
+        echo -e "  ${GREEN}不限量計劃，已用 $(fm "$billedCalls") 次（實際請求 $(fm "$realCalls") 次）。${NC}"
     elif (( $(echo "$currentMultiplier > 1" | bc -l) )); then
         echo -e "  ${GREEN}用量正常（${pct}%）。倍率 ×${currentMultiplier}，實際請求 $(fm "$realCalls") 次。${NC}"
     else
@@ -363,11 +397,11 @@ hook_mode() {
     fi
     
     local windowCalls rateLimit multiplierLabel pct nextResetTime
-    windowCalls=$(echo "$result" | jq -r '.data.windowCalls // 0')
-    rateLimit=$(echo "$result" | jq -r '.data.rateLimit // 1')
+    windowCalls=$(echo "$result" | jq -r '.data.billedCalls // .data.windowCalls // 0')
+    rateLimit=$(echo "$result" | jq -r '.data.rateLimit // 0')
     multiplierLabel=$(echo "$result" | jq -r '.data.multiplierLabel // "×1"')
     nextResetTime=$(echo "$result" | jq -r '.data.nextResetTime // 0')
-    pct=$(echo "scale=1; $windowCalls * 100 / $rateLimit" | bc 2>/dev/null || echo "0")
+    pct=$(pct_of "$windowCalls" "$rateLimit")
     
     # 存快取
     set_cache "$pct" "$windowCalls" "$rateLimit" "$multiplierLabel" "$nextResetTime"
@@ -501,11 +535,13 @@ main() {
         result=$(query_quota "$api_key")
         if echo "$result" | jq -e '.success' >/dev/null 2>&1; then
             local windowCalls rateLimit multiplierLabel pct nextResetTime now_s diff_secs
-            windowCalls=$(echo "$result" | jq -r '.data.windowCalls // 0')
-            rateLimit=$(echo "$result" | jq -r '.data.rateLimit // 1')
+            windowCalls=$(echo "$result" | jq -r '.data.billedCalls // .data.windowCalls // 0')
+            rateLimit=$(echo "$result" | jq -r '.data.rateLimit // 0')
             multiplierLabel=$(echo "$result" | jq -r '.data.multiplierLabel // "×1"')
             nextResetTime=$(echo "$result" | jq -r '.data.nextResetTime // 0')
-            pct=$(echo "scale=1; $windowCalls * 100 / $rateLimit" | bc 2>/dev/null || echo "0")
+            pct=$(pct_of "$windowCalls" "$rateLimit")
+            local usage="${pct}% used (${windowCalls}/${rateLimit})"
+            (( ${rateLimit:-0} <= 0 )) && usage="unlimited (${windowCalls} used)"
             if [[ "$nextResetTime" != "0" && "$nextResetTime" != "null" ]]; then
                 now_s=$(date +%s)
                 diff_secs=$((nextResetTime - now_s))
@@ -513,12 +549,12 @@ main() {
                     local h m
                     h=$((diff_secs / 3600))
                     m=$(((diff_secs % 3600) / 60))
-                    printf "%s%% used (%s/%s) %s - reset in %02d:%02d\n" "$pct" "$windowCalls" "$rateLimit" "$multiplierLabel" "$h" "$m"
+                    printf "%s %s - reset in %02d:%02d\n" "$usage" "$multiplierLabel" "$h" "$m"
                 else
-                    echo "${pct}% used (${windowCalls}/${rateLimit}) ${multiplierLabel} - resetting..."
+                    echo "${usage} ${multiplierLabel} - resetting..."
                 fi
             else
-                echo "${pct}% used (${windowCalls}/${rateLimit}) ${multiplierLabel}"
+                echo "${usage} ${multiplierLabel}"
             fi
         else
             echo "Error: failed to query quota"

@@ -2,20 +2,16 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> ⚠️ **Archived** — YuanyuAI 已將 API CORS 鎖定為同源，第三方頁面（包括 GitHub Pages）無法再跨域查詢用量。**請改用官方面板：https://yuanyuaicloud.cn/query-quota**
-
-> Claude Code skill for monitoring YuanyuAI API key usage (rate limit / quota)
+> Claude Code skill for monitoring YuanyuAI API key usage (rate limit / quota) — uses the official [`/api/query-quota`](https://yuanyuaicloud.cn/api/query-quota) endpoint.
 
 即時查詢 YuanyuAI API Key 嘅用量限制，支援自動用量提醒。
 
 ## What's New
 
-- **Settings Panel** — 設定面板加入 API Key 管理、完整 AI Badge toggle、自動刷新間隔、深色模式、主題切換、顯示區塊控制
-- **Editable Title** — 標題可點擊編輯，自動儲存
-- **SVG Icons** — 全面取代 emoji 作圖標，更清晰一致
-- **Liquid Glass UI** — Web UI 改為全玻璃質感主題，背景漸變＋毛玻璃卡片
-- **Web UI** — 即開即用嘅用量監控面板，支援 `?key=` 快速查詢
-- **GitHub Pages** — [`ricehung.github.io/yuanyuai-quota-skill/`](https://ricehung.github.io/yuanyuai-quota-skill/)
+- **API 查詢回歸** — 官方已開放 `GET /api/query-quota`（免登入，只需 `Authorization: Bearer`），skill 解除封存
+- **週限額顯示** — 新增 `weeklyLimit` / `weeklyBilled` / `nextWeeklyReset` 支援（週限月卡、svip 計劃）
+- **30 秒刷新** — 跟隨官方建議嘅查詢頻率（`--interval 30`）
+- **Web 面板轉向** — GitHub Pages 舊面板因 CORS 同源限制，改為跳轉官方 [`yuanyuaicloud.cn/query-quota`](https://yuanyuaicloud.cn/query-quota)
 
 ## Features
 
@@ -24,7 +20,7 @@
 - ⚠️ **自動提醒** — 用量超過 30% 時自動提示
 - 🔒 **安全儲存** — Key 唔會存喺 repo 內
 - ⏱️ **快取機制** — 15 分鐘內唔重複查詢，唔 spam API
-- 🌐 **Web UI** — GitHub Pages 即開即用 [`ricehung.github.io/yuanyuai-quota-skill/`](https://ricehung.github.io/yuanyuai-quota-skill/)
+- 🌐 **官方網頁面板** — [`yuanyuaicloud.cn/query-quota`](https://yuanyuaicloud.cn/query-quota)（本 repo 嘅 GitHub Pages 舊面板已改為跳轉）
 
 ## Quick Start
 
@@ -43,25 +39,19 @@ sudo apt install jq bc
 ```bash
 # Clone 到你的專案
 cd your-project
-git clone https://github.com/ricehung/yuanyuai-quota-skill.git .claude/skills/yuanyuai-quota --depth 1
+git clone https://github.com/ricehung29/yuanyuai-quota-skill.git .claude/skills/yuanyuai-quota --depth 1
 ```
 
-### 3. 設定 Claude Code
+Claude Code 會自動由 `.claude/skills/<name>/SKILL.md` 載入，用 `/yuanyuai-quota` 呼叫。
 
-在 `.claude/settings.local.json` 加入：
+### 3. 自動用量提醒（可選）
+
+在 `.claude/settings.local.json` 加入 hook：
 
 ```json
 {
-  "skills": {
-    "yuanyuai-quota": {
-      "name": "yuanyuai-quota",
-      "description": "即時查詢同監控 YuanyuAI API Key 嘅用量限制",
-      "directory": ".claude/skills/yuanyuai-quota",
-      "trigger": "yuanyuai-quota"
-    }
-  },
   "hooks": {
-    "post_tool_use": [
+    "PostToolUse": [
       {
         "matcher": "Bash|Edit|Write",
         "hooks": [
@@ -90,7 +80,7 @@ git clone https://github.com/ricehung/yuanyuai-quota-skill.git .claude/skills/yu
 | `/yuanyuai-quota --save sk-xxxxx` | 儲存 Key 並查詢 |
 | `/yuanyuai-quota --check` | 完整報告 |
 | `/yuanyuai-quota --oneline` | 單行輸出 |
-| `/yuanyuai-quota --interval 30` | 監控模式（每 30 秒刷新） |
+| `/yuanyuai-quota --interval 30` | 監控模式（預設每 30 秒刷新，官方建議值） |
 
 ## 自動用量提醒
 
@@ -107,20 +97,24 @@ git clone https://github.com/ricehung/yuanyuai-quota-skill.git .claude/skills/yu
 
 **完整報告：**
 ```
-╔════════════════════════════════════════════════╗
-║        YuanyuAI Token 用量監控              ║
-╚════════════════════════════════════════════════╝
-
-  🔑 Key: glm5.2-3000次-iN01tv
+  🔑 Key: kimi-k3-1000次-k8pw87
   ● ✓ 正常
-  剩餘額度:  19%  剩餘 2,441 次
-  ／ 3,000 次總額度 · 已用 559 次
-  ...
+
+  剩餘額度
+   25%  剩餘 750 次
+  ／ 1,000 次總額度 · 已用 250 次
+
+  📊 詳細數據
+  │ 計費請求    │ 250 │ 實際請求 │ 125 │ 當前倍率 │ ×2 │
+
+  📅 本週額度
+  已用 1,851 / 12,000 次 · 剩餘 10,149 次
+  週重置: 11/16 00:00
 ```
 
 **單行模式：**
 ```
-25.9% used (779/3000) ×2 (13:00-18:59) - reset in 02:36
+25.0% used (250/1000) ×2 (13:00-18:59) - reset in 03:44
 ```
 
 **自動提醒（> 30%）：**
@@ -130,18 +124,23 @@ git clone https://github.com/ricehung/yuanyuai-quota-skill.git .claude/skills/yu
    Reset in: 1h 20m
 ```
 
-## Web UI (GitHub Pages)
+## 測試
 
-> ⚠️ **Deprecated** — YuanyuAI 已啟用 `strict-origin-when-cross-origin` 並將 CORS `Access-Control-Allow-Origin` 鎖定為 `https://yuanyuaicloud.cn`，第三方 domain 嘅瀏覽器請求已被阻止。Web UI 面板已無法正常運作。
+```bash
+./test.sh   # 用 stub curl 跑 4 個 case，唔會打真 API
+```
 
-即開即用嘅用量監控面板：[`https://ricehung.github.io/yuanyuai-quota-skill/`](https://ricehung.github.io/yuanyuai-quota-skill/)
+## Web UI
 
-**快速查詢連結：** `https://ricehung.github.io/yuanyuai-quota-skill/?key=sk-xxxxx`
+官方面板：[`https://yuanyuaicloud.cn/query-quota`](https://yuanyuaicloud.cn/query-quota)
 
-貼上你的 API Key 即開即用，支援手機 PWA 安裝。**（因 CORS 限制已無法使用）**
+> 本 repo 嘅 GitHub Pages 舊面板已停用 —— API 嘅 `Access-Control-Allow-Origin` 鎖定為 `https://yuanyuaicloud.cn`，第三方 domain 嘅瀏覽器請求會被封鎖。`docs/index.html` 現時只做轉向。
+> CLI / skill 唔受影響：`curl` 唔受 CORS 限制。
 
 ## 安全
 
+- API 只查詢該 Key 對應嘅套餐，唔會回傳帳號餘額、訂單或其他 Key
+- 官方建議每 30 秒查詢一次
 - API Key 儲存喺 `~/.config/peanutking/yuanyuai_key`
 - 權限 `chmod 600`，僅 owner 可讀寫
 - 唔會被 git 追蹤
