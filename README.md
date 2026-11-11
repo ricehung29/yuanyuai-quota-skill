@@ -4,10 +4,13 @@
 
 > Claude Code skill for monitoring YuanyuAI API key usage (rate limit / quota) — uses the official [`/api/query-quota`](https://yuanyuaicloud.cn/api/query-quota) endpoint.
 
+**✅ 2026-11-11 — 本 skill 已恢復運作。** 官方重新開放 `GET /api/query-quota`，repo 解封並同步更新。
+
 即時查詢 YuanyuAI API Key 嘅用量限制，支援自動用量提醒。
 
 ## What's New
 
+- **2026-11-11 · 解除封存** — 官方 API 查詢恢復，repo 重新上線（詳見 [Changelog](#changelog)）
 - **API 查詢回歸** — 官方已開放 `GET /api/query-quota`（免登入，只需 `Authorization: Bearer`），skill 解除封存
 - **週限額顯示** — 新增 `weeklyLimit` / `weeklyBilled` / `nextWeeklyReset` 支援（週限月卡、svip 計劃）
 - **30 秒刷新** — 跟隨官方建議嘅查詢頻率（`--interval 30`）
@@ -144,6 +147,30 @@ Claude Code 會自動由 `.claude/skills/<name>/SKILL.md` 載入，用 `/yuanyua
 - API Key 儲存喺 `~/.config/peanutking/yuanyuai_key`
 - 權限 `chmod 600`，僅 owner 可讀寫
 - 唔會被 git 追蹤
+
+## Changelog
+
+### 2026-11-11 — 解除封存，skill 回歸 ✅
+
+官方重新支援 API 查詢額度，免登入：
+
+```bash
+curl 'https://yuanyuaicloud.cn/api/query-quota' \
+  -H 'Authorization: Bearer YOUR_API_KEY'
+```
+
+- 🟢 **Skill 恢復運作** — repo 由封存狀態復原，`/yuanyuai-quota` 可正常查詢
+- 🟢 **修好 `billedCalls`** — 舊版只讀 `windowCalls`，API 改欄位後 hook 模式靜默失效；現以 `billedCalls` 優先，`windowCalls` 作 fallback
+- 🟢 **新增週限額** — 顯示 `weeklyLimit` / `weeklyBilled` / `nextWeeklyReset`（週限月卡、svip 計劃）
+- 🟢 **修好不限量計劃** — `rateLimit: 0` 唔再除零，顯示「不限量」（svip）
+- 🟢 **`test.sh`** — 4 個離線 stub case（有上限 / 不限量 / 舊欄位 / API 錯誤），唔會打真 API
+- 🟡 **Web 面板改為轉向** — CORS 仍鎖定 `https://yuanyuaicloud.cn`，GitHub Pages 無法直接查詢，`docs/index.html` 改為跳轉官方面板；CLI 用 `curl` 唔受 CORS 影響，所以 skill 照用
+- 🟡 **文件修正** — hook event `post_tool_use` → `PostToolUse`，指令 `/quota` → `/yuanyuai-quota`
+
+### 2026-08-04 — 封存
+
+YuanyuAI 將 API CORS 鎖為同源，第三方頁面無法跨域查詢，repo 一度封存。
+事後確認：受影響嘅只有瀏覽器面板，`curl` 一直無問題 —— 所以 11-11 官方重開 API 後即刻復原。
 
 ## License
 
